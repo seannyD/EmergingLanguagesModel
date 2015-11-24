@@ -1,0 +1,9 @@
+Number,RunName,nAgents,alpha,nManualSigns,nSpokenSigns,nClans,MaxSizeCompounds,clanWeight,compoundWeight,genderWeight,deafCommunityWeight,gCarry,gDom,probOfBirthDeathEachStage,maxNumberOfBirthDeathEachStage,maxNumberOfMarriagePartners,proportionOfMarriedAgents,proportionOfMarriedAgentsDeaf,marriageAttitudes_deaf_deaf,marriageAttitudes_deaf_hearing,marriageAttitudes_hearing_deaf,marriageAttitudes_hearing_hearing,CulturalInheritance,MarriageLocality,MarryOutsiders,nStages,nSimulations
+1,KK_Default,70,0.9,10,10,10,25,3,4,2,1,0.176,0.022,0.99,3,1,0.64,0.85,0.875,0.125,0.0013,0.9987,Patrilineal,Patrilocal,False,1000,10
+2,KK_Endangerment,,,,,,,,,,,,,,,,,,,,,,,,TRUE,,
+3,KK_SmallCommunity,720,,,,2,,,,,,,,,,,,,,,,,,,,,
+4,KK_LargeCommunity,20000,,,,,,,,,,,,,,,,,,,,,,,,,
+5,BulelengGeneralSituation,,,,,,,,,,,0,0.0067,,,,,0.295,,,,,,,TRUE,,
+6,UrbanSituation,16000000,,,,,6,,,,,0,0.001,,,,,,,,,,,,TRUE,,
+7,KK_DeafDeafMarriageTaboo,,,,,,,,,,,,,,,,,,0,,,,,,,,
+8,KK_LowIncidence,,,,,,,,,,,,0.01,,,,,,,,,,,,,,
