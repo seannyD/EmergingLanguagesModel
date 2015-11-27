@@ -1,1 +1,3 @@
 *.pyc
+results/old/*
+results/old
