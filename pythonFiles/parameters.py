@@ -16,15 +16,17 @@ def readParameters():
 	# convert to numbers
 	for d in params.keys():
 		for attr in params[d].keys():
-			try:
-				params[d][attr] = float(params[d][attr])
-			except:
-				pass
-			try:
-				params[d][attr] = int(params[d][attr])
-			except:
-				pass
-
+			if params[d][attr].count("."):
+				try:
+					params[d][attr] = float(params[d][attr])
+				except:
+					pass
+			else:
+				try:
+					params[d][attr] = int(params[d][attr])
+				except:
+					pass
+		
 	default = params[1]
 	
 	# fill in defaults

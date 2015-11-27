@@ -33,6 +33,11 @@ def setUpFolders(parameters, deletePrevResults = False):
 
 def simulation(parameters):
 	world1 = world(parameters)
+	if world1.parameters["RunName"]=="Test":
+		print "TEST"
+		for x in world1.parameters.keys():
+			print x,world1.parameters[x]
+		print [a.genes for a in world1.pop]
 	im = InteractionsMaker(world1,filename=parameters["ResultsFileName"])
 	marriages(im.world)
 	nStages = parameters["nStages"]

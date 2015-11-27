@@ -4,14 +4,14 @@ p1
 I1000
 sS'ParamFileName'
 p2
-S'../results/KK_Default/KK_Default_parameters.p'
+S'../results/KK_DeafMarriageTabooMax/KK_DeafMarriageTabooMax_parameters.p'
 p3
 sS'deafCommunityWeight'
 p4
 I1
 sS'FolderName'
 p5
-S'../results/KK_Default/'
+S'../results/KK_DeafMarriageTabooMax/'
 p6
 sS'compoundWeight'
 p7
@@ -43,7 +43,7 @@ p16
 I10
 sS'marriageAttitudes_deaf_hearing'
 p17
-I0
+I1
 sS'marriageAttitudes_hearing_hearing'
 p18
 I0
@@ -62,7 +62,7 @@ p23
 I10
 sS'ResultsFileName'
 p24
-S'../results/KK_Default/KK_Default294.res'
+S'../results/KK_DeafMarriageTabooMax/KK_DeafMarriageTabooMax965.res'
 p25
 sS'nSpokenSigns'
 p26
@@ -82,7 +82,7 @@ I0
 ssI01
 (dp31
 I00
-I0
+I1
 sI01
 I0
 sssS'nClans'
@@ -99,10 +99,10 @@ p35
 I0
 sS'Number'
 p36
-I1
+I5
 sS'RunName'
 p37
-S'KK_Default'
+S'KK_DeafMarriageTabooMax'
 p38
 sS'gCarry'
 p39

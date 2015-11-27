@@ -1,0 +1,9 @@
+#!/bin/sh
+#$ -N SeanRXRFCI4001
+#$ -cwd
+#$ -q all.q
+#$ -S /bin/bash
+#$ -p -10
+dir=$HOME/SignSpeechModel/Model/pythonFiles
+cd $dir
+python modelAnalysis.py 10
