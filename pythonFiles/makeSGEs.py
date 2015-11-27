@@ -8,9 +8,8 @@ sge= """#!/bin/sh
 #$ -S /bin/bash
 #$ -p -10
 dir=$HOME/SignSpeechModel/Model/pythonFiles
-binary=/usr/local/lib64/R/bin/Rscript
 cd $dir
-$binary modelAnalysis.py NUMX
+python modelAnalysis.py NUMX
 """
 
 gfolder = "../gridEngineFiles/"

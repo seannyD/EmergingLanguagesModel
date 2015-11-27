@@ -1,0 +1,25 @@
+1.      KK_default
+
+2.      KK_SmallCommunity: taking the smallest known deaf community for which there are actual numbers (Chican Sign Language), and assuming at least 2 cultural "clans" (Catholics and Protestants in this case).
+
+3.      KK_LargeCommunity: setting community size to 4,000 (20,000 or more will not be feasible with our model)
+
+4.      KK_DeafDeafMarriageTabooModerate: the situation in which there is a taboo against deaf-deaf marriages, and deaf individuals are less likely to get married; modelled after figures from Adamorobe, Ghana in which genetic counselling was moderately effective.
+
+5.      KK_DeafMarriageTabooMax:  simulates the cases where there is a strong cultural norm of getting married (as in the Kata Kolok case), but it cannot be with a deaf partner (this is consistent with the Alipur case). 
+
+6.      KK_LowIncidence: the incidence of deafness reported as in the situation of rural West Africa.
+
+7.      KK_HighIncidence: the incidence of deafness reported in AdaSL in 1961 (I suppose contrasting the KK_default with KK_LowIncidence and KK_HighIncidence tells us something more about the role of critical mass (sufficient deaf people) to set things off.)
+
+8.      KK_HearingCarriersLow: identical situation as in Bali, but hearing individuals do not carry the deaf gene initially
+
+9.      KK_HearingCarriersHigh: I have had to make this figure up, because we really do not know from any other populations what the estimated icidence is.
+
+10.   KK_NoSocialStructure: tests the relevance of having a community set-up in restricted social groups by excluding those weights.
+
+11.   KK_Endangerment: testing the hypothesis that marrying outside the community on its own will lead to sign language endangerment
+
+12.   BulelengGeneralSituation:  taking the general statistics from this region of Bali in terms of the incidence of deafness and  deaf marriage rates to see if this situation could arrise spontaneously without deaf genes present.
+
+13.   UrbanSituation: testing whether the model might accurately predict the absence of widespread bimodal bilingualism in urban settings. Because of the restrictions on the model (and the time it takes to run) as well as limited info, we've had to compromise here. We've set the total community size to 4000, the maximum  compound size to 6 (nuclear families) and the overall incidence of deafness conform Western figures. I have used the general Balinese marriage rates and allowed for marrying outside the community too, because I am not sure that Western marriage rates would accurately represent the relationships people engage in.

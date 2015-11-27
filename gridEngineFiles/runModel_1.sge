@@ -5,6 +5,5 @@
 #$ -S /bin/bash
 #$ -p -10
 dir=$HOME/SignSpeechModel/Model/pythonFiles
-binary=/usr/local/lib64/R/bin/Rscript
 cd $dir
-$binary modelAnalysis.py 1
+python modelAnalysis.py 1

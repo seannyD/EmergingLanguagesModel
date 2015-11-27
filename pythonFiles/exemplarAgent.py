@@ -56,9 +56,10 @@ class agentEpsilon:
 
     def attitude(self):
         "If I am not a signer, but I encounter a deaf person, what do I do?"
+        
+        return [0,np.random.randint(self.nm)]
         # server mod
-        #return [0,np.random.randint(self.nm)]
-        return [0,random.randint(0,self.nm-1)]
+        #return [0,random.randint(0,self.nm-1)]
 
 
     def speak(self, whoTo):
@@ -66,33 +67,37 @@ class agentEpsilon:
         listenerStatus = whoTo.deafStatus #is the listener deaf?
         if listenerStatus == True:
             if "0" in self.memory.keys(): # do i know any signs?
+
+                return np.array([0,np.random.choice(self.memory["0"])])
             	# server mod
-                #return np.array([0,np.random.choice(self.memory["0"])])
-                return np.array([0,random.choice(self.memory["0"])])
+                #return np.array([0,random.choice(self.memory["0"])])
             else: # If i don't know signs, what do i do?
                 return self.attitude()
         else:
             if self.cache == []:
                 if self.deafStatus == True:
                 	#server mod
-                    #datapair = np.array([0,np.random.randint(self.nm)])
-                    datapair = np.array([0,random.randint(0,self.nm-1)])
+                	#datapair = np.array([0,random.randint(0,self.nm-1)])
+                    datapair = np.array([0,np.random.randint(self.nm)])
+
                     self.memory["0"] = [datapair[1]]
                     self.cache.append(datapair)
                     return datapair
                 else:
-                    #chosenModality = stats.binom.rvs(n=1,p=self.alpha)
+                    chosenModality = stats.binom.rvs(n=1,p=self.alpha)
                     # server mod
-                    chosenModality = stats.binom.rvs(1,self.alpha)
+                    #chosenModality = stats.binom.rvs(1,self.alpha)
+                    
+                    datapair = np.array([chosenModality,np.random.randint(self.nm)])
                     # server mod
-                    #datapair = np.array([chosenModality,np.random.randint(self.nm)])
-                    datapair = np.array([chosenModality,random.randint(0,self.nm-1)])
+                    #datapair = np.array([chosenModality,random.randint(0,self.nm-1)])
                     self.memory[str(chosenModality)] = [datapair[1]]
                     return datapair
             else:
-            	# server mod
-                #whichDatapair = np.random.choice(range(len(self.cache)))
+            	
                 whichDatapair = random.choice(range(len(self.cache)))
+                # server mod
+                #whichDatapair = np.random.choice(range(len(self.cache)))
                 return self.cache[whichDatapair]
                 
 

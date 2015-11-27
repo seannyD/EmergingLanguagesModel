@@ -35,9 +35,9 @@ def assignGenetics(world):
 	
 	# 0 = hearing, 1 = deaf
 
-	#nZeroOne = binom.rvs(n=n_oneCopy,p=.5)
+	nZeroOne = binom.rvs(n=n_oneCopy,p=.5)
 	# server mod
-	nZeroOne = binom.rvs(n_oneCopy,.5)
+	#nZeroOne = binom.rvs(n_oneCopy,.5)
 	nOneZero = n_oneCopy - nZeroOne
 	gene_distribution = ([(0,1)]*nZeroOne) + ([(1,0)]*nOneZero) + ([(1,1)] * n_twoCopies) + ([(0,0)] * n_zeroCopies)
 	
@@ -85,9 +85,10 @@ def reproduce(agentA,agentB, world):
 def births_and_deaths(world):
 	""" Population change by replacement
 	"""
+	
+	nHits = binom.rvs(n=world.parameters["maxNumberOfBirthDeathEachStage"],p=world.parameters["probOfBirthDeathEachStage"])
 	# server mod
-	#nHits = binom.rvs(n=world.parameters["maxNumberOfBirthDeathEachStage"],p=world.parameters["probOfBirthDeathEachStage"])
-	nHits = binom.rvs(world.parameters["maxNumberOfBirthDeathEachStage"],world.parameters["probOfBirthDeathEachStage"])
+	#nHits = binom.rvs(world.parameters["maxNumberOfBirthDeathEachStage"],world.parameters["probOfBirthDeathEachStage"])
 
 	for i in range(nHits):
 			# find a couple to have a child

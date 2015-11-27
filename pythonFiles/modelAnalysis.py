@@ -1,11 +1,12 @@
 from marriage import *
 from parameters import *
 from interactions import *
-
-# test update
-
 import os, csv, sys, random, pickle
 # (removed pandas because it's not installed on the server)
+
+
+#python modelAnalysis.py 1
+# Will run 1 simulation with parameters taken from the first line of the csv file.
 
 
 def runSimulations():
