@@ -12,9 +12,9 @@ class InteractionsMaker:
   def __init__(self, world,filename="testfile.csv"):
       self.world = world
       self.filename = filename
-      f = open(self.filename,'w')
-      f.write("")
-      f.close()
+      #f = open(self.filename,'w')
+      #f.write("")
+      #f.close()
 
   def metrics(self,stage):
       outString = ""
@@ -41,10 +41,12 @@ class InteractionsMaker:
         popString = ""
       #  for i in np.nditer(self.world.popStructure):
       #    popString += str(i)+"-"
-        outString += stage+","+agentID+","+deafStatus+","+nSigns+","+nSounds+","+popString+"\n"
-      f = open(self.filename,'a')
-      f.write(outString)
-      f.close()
+        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString])+"\n"
+#      if write:
+#        f = open(self.filename,'a')
+#        f.write(outString)
+#        f.close()
+      return outString
       
         
 
@@ -78,12 +80,14 @@ class InteractionsMaker:
 
   def simulateOneStage(self,stage,sampleEvery=20):
       self.interactionsBatch()
-      if stage == 0:
-        marriages(self.world)
+#      if stage == 0:
+#        marriages(self.world)
       births_and_deaths(self.world)
 #      print "NUMBER MARRIED",numberOfMarriedAgents(self.world)
       if (stage % sampleEvery) ==0:
-              self.metrics(stage)
+              return self.metrics(stage)
+      else:
+              return ""
 
 
 

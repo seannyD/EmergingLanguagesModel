@@ -62,14 +62,14 @@ p23
 I10
 sS'ResultsFileName'
 p24
-S'../results/Test/Test289.res'
+S'../results/Test/Test971.res'
 p25
 sS'nSpokenSigns'
 p26
 I10
 sS'nAgents'
 p27
-I76
+I30
 sS'marriageAttitudes'
 p28
 (dp29

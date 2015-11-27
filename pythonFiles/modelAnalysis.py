@@ -29,9 +29,16 @@ def setUpFolders(parameters, deletePrevResults = False):
 			prevFiles = [ folderName + f for f in os.listdir(folderName) if f.endswith(".res") ]
 			for f in prevFiles:
 				os.remove(f)
-	
+
+def writeResultsString(res,file):
+	o = open(file,'w')
+	o.write(res)
+	o.close()
 
 def simulation(parameters):
+
+	resultsString = "stage,id,deaf,signs,sounds,structure\n"
+	
 	world1 = world(parameters)
 	if world1.parameters["RunName"]=="Test":
 		print "TEST"
@@ -43,10 +50,11 @@ def simulation(parameters):
 	nStages = parameters["nStages"]
 	
 	for stage in xrange(nStages):
-		im.simulateOneStage(stage)
+		resultsString += im.simulateOneStage(stage)
 		if (stage % 3) ==0:
 			marriages(im.world)
 			im.world.rebalance_structures()
+	writeResultsString(resultsString,im.filename)
 	return world1
 
 
