@@ -5,15 +5,13 @@ setwd("~/Documents/MPI/EmergingLanguages/SignSpeechConnieBill/Model/")
 
 
 
-plotMeanRun = function(dx, plotIndividualRuns=T,legendLab=""){
+plotMeanRun = function(dx, plotIndividualRuns=T){
 	px = ggplot(data=dx, aes(x=stage, y=prop.deaf, group=runName)) +
 	 geom_smooth(aes(colour=runName), lwd=2)  +
 	 xlab("") +
 	 ylab("Proportion of\ndeaf agents") +
 	 theme(legend.position="top", axis.title.y=element_text(angle=0),legend.title=element_blank())  
 
-	  
-	 
 	 if(plotIndividualRuns){
 	 	px = px + 	geom_line(aes(group=runNameNum, colour=runName), alpha=0.2)
 	 }
@@ -93,10 +91,10 @@ test3 = rbind(
 	loadData("KK_LargeCommunity")
 )
 
-test3[test3$runName=="KK_Default",]$runName = "Medium Population"
-test3[test3$runName=="KK_SmallCommunity",]$runName = "Small Population"
-test3[test3$runName=="KK_LargeCommunity",]$runName = "Large Population"
+test3[test3$runName=="KK_Default",]$runName = "Medium"
+test3[test3$runName=="KK_SmallCommunity",]$runName = "Small"
+test3[test3$runName=="KK_LargeCommunity",]$runName = "Large"
 
 
-plotMeanRun(test3,plotIndividualRuns=F, legendLab='Population Size')
-plotMeanHearingSigns(test3,plotIndividualRuns=F,legendLab='Population Size')
+plotMeanRun(test3,plotIndividualRuns=F)
+plotMeanHearingSigns(test3,plotIndividualRuns=F)
