@@ -30,6 +30,8 @@ def RUN_INTERACTION(agentA,agentB):
     pass
 
 def outer_equals(x):
+	"""Return matrix of 0s and 1s where 1 means 'same' and 0 means 'different'
+	"""
 	x = abs(np.subtract.outer(x,x))
 	x[x <> 0] = -1
 	x[x ==0] = 1
@@ -267,7 +269,8 @@ class world:
 		np.fill_diagonal(self.popStructure, 0.0)
 
     def getCompoundCounts(self):
-    	return [(i,sum([z==i for z in self.compounds])) for i in range(self.initialNumberOfCompounds)]
+    	comps = list(set(self.compounds))
+    	return [(i,sum([z==i for z in self.compounds])) for i in comps]
     	
 
     def rebalance_structures(self):

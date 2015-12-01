@@ -4,6 +4,7 @@ import math
 import random
 from scipy.stats import binom
 
+
 # def assignGenetics(world):
 # 	
 # 	nDeaf = int(math.ceil(world.nAgents *world.parameters["gDom"]))
@@ -24,6 +25,10 @@ from scipy.stats import binom
 # 			agent.deafStatus = True
 # 		else:
 # 			agent.deafStatus = False
+
+def findMarriedCouples(world):
+	m = np.where(world.marriageStructure>0)
+	return(zip(m[0],m[1]))
 
 def assignGenetics(world):
 	

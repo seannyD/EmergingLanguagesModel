@@ -2,6 +2,8 @@ import numpy as np
 import math
 import random
 import copy
+from populationStructure import *
+from genetics import *
 
 def roulette_wheel(scores):
     "Given a list of scores, returns a position in that list randomly in proportion to its score (stolen code!)"
@@ -18,7 +20,101 @@ def roulette_wheel(scores):
     sx = [i/float(sum(scores)) for i in scores]
     return(np.where(np.random.multinomial(n=1,pvals = sx)==1)[0])
 
+def findMarriedCouples(world):
+	m = np.where(world.marriageStructure>0)
+	return(zip(m[0],m[1]))
+
 def marriages(world):
+	nDeaf = sum([x.deafStatus for x in world.pop])
+	nHearing = len(world.pop) - nDeaf
+	
+	# ideal proportions, as governed by the parameters
+	idealNumMarriages_hearing = math.floor(world.parameters["proportionOfMarriedAgents"] * nHearing)
+	idealNumMarriages_deaf = math.floor(world.parameters["proportionOfMarriedAgentsDeaf"]* nDeaf)
+	
+	# number we need to add in each modality
+	shortage_hearing = nHearing - idealNumMarriages_hearing
+	shortage_deaf = nDeaf - idealNumMarriages_deaf
+
+	# numbers must be even
+	shortage_hearing -= (shortage_hearing % 2)
+	shortage_deaf -= (shortage_deaf % 2)
+	
+	mp = getMarriageProbs(world)
+	
+	while (shortage_hearing >0 or shortage_deaf >0) and np.sum(mp)>0:
+		mpx = np.where(mp>0)
+		chosenPartners = zip(mpx[0],mpx[1])[np.random.choice(range(len(mpx[0])), p=mp[mpx])]
+		marryTwoAgents(world,int(chosenPartners[0]),int(chosenPartners[1]))
+		mp = getMarriageProbs(world)
+		if world.pop[chosenPartners[0]].deafStatus:
+			shortage_deaf -= 1
+		else:
+			shortage_hearing -= 1
+		if world.pop[chosenPartners[1]].deafStatus:
+			shortage_deaf -= 1
+		else:
+			shortage_hearing -= 1
+		minmp = np.min(mp)*0.01
+		if shortage_deaf<=0 and shortage_deaf >-2:
+			deafx = [a.deafStatus for a in world.pop]
+			deafx =  np.subtract.outer(deafx,deafx)
+			mp[deafx] *= 0.01
+			sumx = np.sum(mp)
+			if sumx>0:
+				mp /= sumx
+			shortage_deaf = -2
+		if shortage_hearing<=0 and shortage_hearing >-2:
+			deafx = [not a.deafStatus for a in world.pop]
+			deafx =  np.subtract.outer(deafx,deafx)
+			mp[deafx] *= 0.01
+			sumx = np.sum(mp)
+			if sumx>0:
+				mp /= sumx
+			shortage_hearing = -2
+
+def getMarriageProbs(world):
+	
+	ms = copy.deepcopy(world.marriageStructure)
+	ps = copy.deepcopy(world.popStructure)
+	# exclude agents who have enough marriage partners
+	married = np.where(np.sum(ms,axis=1)>=world.parameters["maxNumberOfMarriagePartners"])
+	ps[married,:] = 0
+	ps[:,married] = 0
+	
+	# exclude agents in the same compound
+	cx = outer_equals(world.compounds)
+	ps[np.where(cx==1)] = 0
+	
+	# exclude agents of the same sex
+	g = [a.sex for a in world.pop]
+	gx = abs(np.subtract.outer(g,g))
+	ps[np.where(gx<0.5)] = 0
+	
+	# weight preferences by social structure
+	dpref = copy.deepcopy(world.popStructure)
+	dpref[:] = 0
+	deafx = [a.deafStatus for a in world.pop]
+	deafx =  np.subtract.outer(deafx,deafx)
+	dpref[np.where(deafx)] = world.parameters["marriageAttitudes_deaf_deaf"]
+	dpref[np.where(deafx==False)] = world.parameters["marriageAttitudes_deaf_hearing"]
+	
+	mpref = dpref * ps
+	sump = np.sum(mpref)
+	if sump>0:
+		mpref = mpref /sump
+	return mpref
+
+def marryTwoAgents(world,a_index1,a_index2):
+	world.marriageStructure[a_index1,a_index2] = 1
+	world.marriageStructure[a_index2,a_index1] = 1
+	world.changeSocialStructruresAfterMarriage(a_index1,a_index2)
+
+def numberOfMarriedAgents(world):
+	return sum(np.sum(world.marriageStructure, axis=1)>0)
+
+
+def marriages_old(world):
 	""" Arrange marriages until the number of marriages matches the proscribed number
 	"""
 	#print "Arrange marriages"
@@ -111,19 +207,14 @@ def marriages_sep(world):
 		
 	
 
-def numberOfMarriedAgents(world):
-	return sum(np.sum(world.marriageStructure, axis=1)>0)
-
-def findMarriedCouples(world):
-	m = np.where(world.marriageStructure>0)
-	return(zip(m[0],m[1]))
-
 def countMarried(world,deafStatus=True):
 	""" Count the number of married people, either in the deaf or hearing population"""
 	mx = findMarriedCouples(world)
 	dstatus = [a.deafStatus==deafStatus for a in world.pop]
 	number_of_deaf_people_married = np.sum(np.sum(world.marriageStructure[np.where(dstatus),:], axis=2)>0)
 	return number_of_deaf_people_married	
+
+
 
 	
 def marriage(world, deafStatus=None):
@@ -139,6 +230,7 @@ def marriage(world, deafStatus=None):
 	if len(candidates) >0:
 		candidate_weights = getCandidateWeights(target,freeAgents,world)
 		new_partner = (freeAgents[roulette_wheel(candidate_weights)])
+		marryTwoAgents(world,target,new_partner)
 		world.marriageStructure[target,new_partner] = 1
 		world.marriageStructure[new_partner,target] = 1
 		world.changeSocialStructruresAfterMarriage(target,new_partner)
@@ -187,4 +279,8 @@ def getCandidateWeights(target_agent_id, agent_ids, world):
 	total_weights = np.array(cand_weights) * np.array(socialLinks)
 	return(total_weights)
 	
+
+
+
+
 

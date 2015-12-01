@@ -1,6 +1,7 @@
 from marriage import *
 from parameters import *
 from interactions import *
+from genetics import *
 import os, csv, sys, random, pickle
 # (removed pandas because it's not installed on the server)
 
