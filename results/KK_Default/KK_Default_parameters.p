@@ -62,7 +62,7 @@ p23
 I10
 sS'ResultsFileName'
 p24
-S'../results/KK_Default/KK_Default25.res'
+S'../results/KK_Default/KK_Default174.res'
 p25
 sS'nSpokenSigns'
 p26
