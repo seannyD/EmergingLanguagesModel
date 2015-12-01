@@ -90,17 +90,13 @@ class world:
        # fill compounds
         self.compounds = [0]
         currentComp = 0
-        compCount = 0
+
         for i in range(len(self.clans))[1:]:
-            if self.clans[i]==self.clans[i-1]:
-                 self.compounds.append(currentComp)
-                 compCount += 1
-                 if self.compounds.count(currentComp)>= self.parameters["MaxSizeCompounds"]:
-                     currentComp += 1
-            else:
-            	currentComp += 1
-            	self.compounds.append(currentComp)
-            	compCount = 1
+        	self.compounds.append(currentComp)
+        	if self.compounds.count(currentComp)>= self.parameters["MaxSizeCompounds"]:
+        		currentComp += 1
+
+            	
 		# get social structures
         self.popStructure = self.getSocialStructure()
         
@@ -269,8 +265,7 @@ class world:
 		np.fill_diagonal(self.popStructure, 0.0)
 
     def getCompoundCounts(self):
-    	comps = list(set(self.compounds))
-    	return [(i,sum([z==i for z in self.compounds])) for i in comps]
+    	return [(i,sum([z==i for z in self.compounds])) for i in range(self.initialNumberOfCompounds)]
     	
 
     def rebalance_structures(self):
@@ -290,6 +285,9 @@ class world:
 			# find (first) biggest compound
 			maxC = max([x[1] for x in comps_cnt])
 			biggest = random.choice([x[0] for x in comps_cnt if x[1]==maxC])
+			zeroCompChoices = [x[0] for x in comps_cnt if x[1]==0]
+			if len(zeroCompChoices) == 0:
+				break
 			zeroCompound = random.choice([x[0] for x in comps_cnt if x[1]==0])
 
 			newCompound = np.array(copy.deepcopy(self.compounds))

@@ -74,3 +74,11 @@ test2 = rbind(
 )
 
 plotMeanRun(test2)
+
+
+test2 = rbind(
+	loadData("KK_Default"),
+	loadData("KK_SmallCommunity")
+)
+
+plotMeanRun(test2)
