@@ -39,9 +39,10 @@ class InteractionsMaker:
         else:
           nSounds = "0"
         popString = ""
+        ageString = str(a.age)
       #  for i in np.nditer(self.world.popStructure):
       #    popString += str(i)+"-"
-        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString])+"\n"
+        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString])+"\n"
 #      if write:
 #        f = open(self.filename,'a')
 #        f.write(outString)
@@ -84,6 +85,8 @@ class InteractionsMaker:
 #        marriages(self.world)
       births_and_deaths(self.world)
 #      print "NUMBER MARRIED",numberOfMarriedAgents(self.world)
+#     increase age of agents
+      [a.incAge() for a in self.world.pop]		
       if (stage % sampleEvery) ==0:
               return self.metrics(stage)
       else:

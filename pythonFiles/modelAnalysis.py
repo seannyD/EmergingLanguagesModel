@@ -38,7 +38,7 @@ def writeResultsString(res,file):
 
 def simulation(parameters):
 
-	resultsString = "stage,id,deaf,signs,sounds,structure\n"
+	resultsString = "stage,id,deaf,signs,sounds,structure,age\n"
 	
 	world1 = world(parameters)
 	if world1.parameters["RunName"]=="Test":
@@ -52,6 +52,7 @@ def simulation(parameters):
 	
 	for stage in xrange(nStages):
 		resultsString += im.simulateOneStage(stage)
+		print world1.pop[0].getMeaningCounts()
 		if (stage % 3) ==0:
 			marriages(im.world)
 			im.world.rebalance_structures()

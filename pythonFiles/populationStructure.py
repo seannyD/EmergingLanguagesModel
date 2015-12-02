@@ -264,9 +264,12 @@ class world:
         # zero chance of communicating with self.
 		np.fill_diagonal(self.popStructure, 0.0)
 
+    def getCommSimilarityMatrix(self):
+    	SignProp = []
+
     def getCompoundCounts(self):
     	return [(i,sum([z==i for z in self.compounds])) for i in range(self.initialNumberOfCompounds)]
-    	
+	
 
     def rebalance_structures(self):
 		"""Find compounds with zero people.  Find the largest compound, and send half the people

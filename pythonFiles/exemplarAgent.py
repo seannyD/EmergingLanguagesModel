@@ -33,8 +33,43 @@ class agentEpsilon:
         self.sex = sex
         self.genes = genes
         self.ID = ID
+        self.age = 0
   #      self.children = 0
+	
+    def getSignProp(self):
+		""" Return the proportion of signs in the memory"""
+		if len(self.memory.keys())==0:
+			return 0
+		nsign = len(self.memory["0"])
+		nspeech = len(self.memory["1"])
+		if nsign ==0:
+			return 0.0
+		if  nspeech ==0:
+			return 1.0
+		return nsign/float(nspeech+nsign)
 
+	def incAge(self):
+		self.age += 1
+		
+    def getMeaningCountsM(self,modality):
+		if not modality in self.memory.keys():
+			if modality=="0":
+				return [0] * self.nm
+			else:
+				return [0] * self.ns
+		rx = []
+		if modality=="0":
+			rx = np.array([self.memory[modality].count(x) for x in range(self.nm)],dtype='float')
+		if modality=="1":
+			rx = np.array([self.memory[modality].count(x) for x in range(self.ns)],dtype='float')
+		return rx
+	
+    def getMeaningCounts(self):
+    	dM = self.getMeaningCountsM("0")
+    	hM = self.getMeaningCountsM("1")
+    	ret = dM + hM
+    	return ret / np.max(ret)
+	
     def updateCache(self,datapair):
         "datapair = [modality, signal]"
         "modality = 0 (sign) or 1 (speech)"
