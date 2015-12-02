@@ -62,14 +62,14 @@ p23
 I10
 sS'ResultsFileName'
 p24
-S'../results/KK_SmallCommunity/KK_SmallCommunity157.res'
+S'../results/KK_SmallCommunity/KK_SmallCommunity565.res'
 p25
 sS'nSpokenSigns'
 p26
 I10
 sS'nAgents'
 p27
-I100
+I500
 sS'marriageAttitudes'
 p28
 (dp29

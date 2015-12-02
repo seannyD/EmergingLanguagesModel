@@ -66,16 +66,19 @@ loadData = function(paramName){
 ##########
 
 
-params = read.csv("Parameters/KK_Model_parameters.csv")
+params = read.csv("Parameters/KK_Model_parameters.csv",stringsAsFactors=F)
 for(i in 1:ncol(params)){
 	params[is.na(params[,i]),i] = params[1,i]
 }
 
 params = rbind(params,params[1,])
-params[nrow(params),c("runName","nAgents")] = c("KK_100Community",100)
-params[nrow(params),c("runName","nAgents")] = c("KK_500Community",500)
-params[nrow(params),c("runName","nAgents")] = c("KK_800Community",800)
+params[nrow(params),c("RunName","nAgents")] = c("KK_100Community",100)
+params = rbind(params,params[1,])
+params[nrow(params),c("RunName","nAgents")] = c("KK_500Community",500)
+params = rbind(params,params[1,])
+params[nrow(params),c("RunName","nAgents")] = c("KK_800Community",800)
 
+params$nAgents = as.numeric(params$nAgents)
 
 pdf("analysis/graphs/SummaryGraphs.pdf")
 

@@ -62,14 +62,14 @@ p23
 I10
 sS'ResultsFileName'
 p24
-S'../results/KK_LargeCommunity/KK_LargeCommunity801.res'
+S'../results/KK_LargeCommunity/KK_LargeCommunity114.res'
 p25
 sS'nSpokenSigns'
 p26
 I10
 sS'nAgents'
 p27
-I800
+I2000
 sS'marriageAttitudes'
 p28
 (dp29
