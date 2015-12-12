@@ -48,26 +48,30 @@ class agentEpsilon:
 			return 1.0
 		return nsign/float(nspeech+nsign)
 
-	def incAge(self):
-		self.age += 1
+    def incAge(self):
+        self.age += 1
 		
     def getMeaningCountsM(self,modality):
 		if not modality in self.memory.keys():
 			if modality=="0":
-				return [0] * self.nm
+				return np.array([0] * self.nm)
 			else:
-				return [0] * self.ns
-		rx = []
+				return np.array([0] * self.ns)
+		
 		if modality=="0":
-			rx = np.array([self.memory[modality].count(x) for x in range(self.nm)],dtype='float')
+			return np.array([self.memory[modality].count(x) for x in range(self.nm)],dtype='float')
 		if modality=="1":
-			rx = np.array([self.memory[modality].count(x) for x in range(self.ns)],dtype='float')
-		return rx
+			return np.array([self.memory[modality].count(x) for x in range(self.ns)],dtype='float')
+		
 	
     def getMeaningCounts(self):
     	dM = self.getMeaningCountsM("0")
     	hM = self.getMeaningCountsM("1")
     	ret = dM + hM
+    	
+    	ret_max = np.max(ret)
+    	if ret_max==0:
+    		return ret
     	return ret / np.max(ret)
 	
     def updateCache(self,datapair):

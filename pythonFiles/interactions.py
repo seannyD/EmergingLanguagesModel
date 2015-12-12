@@ -39,7 +39,7 @@ class InteractionsMaker:
         else:
           nSounds = "0"
         popString = ""
-        ageString = str(a.age)
+        ageString = str(thisAgent.age)
       #  for i in np.nditer(self.world.popStructure):
       #    popString += str(i)+"-"
         outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString])+"\n"

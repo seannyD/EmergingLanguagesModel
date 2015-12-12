@@ -13,7 +13,7 @@ import os, csv, sys, random, pickle
 def runSimulations():
 	command = sys.argv[-1]
 	paramNum = int(command)
-	print paramNum
+	print "SIMULATION PARAMETERS",paramNum
 	parameters = getParameters(paramNum)
 	setUpFolders(parameters)
 	simulation(parameters)
@@ -39,20 +39,23 @@ def writeResultsString(res,file):
 def simulation(parameters):
 
 	resultsString = "stage,id,deaf,signs,sounds,structure,age\n"
-	
+	print "Setting up world"
 	world1 = world(parameters)
 	if world1.parameters["RunName"]=="Test":
 		print "TEST"
 		for x in world1.parameters.keys():
 			print x,world1.parameters[x]
-		print [a.genes for a in world1.pop]
+		#print [a.genes for a in world1.pop]
+	print "Setting up interactions"
 	im = InteractionsMaker(world1,filename=parameters["ResultsFileName"])
+	print "Setting up marriages"
 	marriages(im.world)
 	nStages = parameters["nStages"]
-	
+	print "Starting Simulation"
 	for stage in xrange(nStages):
+		print ">",stage
 		resultsString += im.simulateOneStage(stage)
-		print world1.pop[0].getMeaningCounts()
+		#print world1.pop[0].getMeaningCounts()
 		if (stage % 3) ==0:
 			marriages(im.world)
 			im.world.rebalance_structures()

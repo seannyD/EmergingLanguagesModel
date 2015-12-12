@@ -135,7 +135,7 @@ w = world(parameters)
 for i in range(len(w.pop)):
 	w.pop[i].deafStatus = i>=3
 marriages2(w)
-print "END"
-print w.marriageStructure
+#print "END"
+#print w.marriageStructure
 
 

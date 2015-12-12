@@ -32,11 +32,12 @@ def RUN_INTERACTION(agentA,agentB):
 def outer_equals(x):
 	"""Return matrix of 0s and 1s where 1 means 'same' and 0 means 'different'
 	"""
-	x = abs(np.subtract.outer(x,x))
-	x[x <> 0] = -1
-	x[x ==0] = 1
-	x[x ==-1] = 0
-	return(x)
+#	x = abs(np.subtract.outer(x,x))
+#	x[x <> 0] = -1
+#	x[x ==0] = 1
+#	x[x ==-1] = 0	
+#	return(x)
+	return (x[:,np.newaxis] == x).astype(int)
 
 
 class world:
@@ -96,18 +97,19 @@ class world:
         	if self.compounds.count(currentComp)>= self.parameters["MaxSizeCompounds"]:
         		currentComp += 1
 
-            	
+#        self.clans = np.array(self.clans)
+#        self.compounds = np.array(self.compounds)            	
 		# get social structures
         self.popStructure = self.getSocialStructure()
         
     def getClanStructure(self):
-    	return(outer_equals(self.clans) * self.parameters["clanWeight"])
+    	return(outer_equals(np.array(self.clans)) * self.parameters["clanWeight"])
         
     def getCompoundStructure(self):
-        return(outer_equals(self.compounds) * self.parameters["compoundWeight"])
+        return(outer_equals(np.array(self.compounds)) * self.parameters["compoundWeight"])
         
     def getGenderStructure(self):
-    	return(outer_equals([x.sex for x in self.pop]) * self.parameters["genderWeight"])
+    	return(outer_equals(np.array([x.sex for x in self.pop])) * self.parameters["genderWeight"])
     
     def getDeafCommunityStructure(self):
     	# this is a matrix which is only 1 if both people are deaf (no advnatage for hearing-hearing)

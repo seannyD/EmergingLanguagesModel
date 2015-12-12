@@ -40,13 +40,23 @@ def marriages(world):
 	shortage_hearing -= (shortage_hearing % 2)
 	shortage_deaf -= (shortage_deaf % 2)
 	
+	#print "GET MARRIAGES INIT"
 	mp = getMarriageProbs(world)
 	
 	while (shortage_hearing >0 or shortage_deaf >0) and np.sum(mp)>0:
+		#print "WHILE"
 		mpx = np.where(mp>0)
 		chosenPartners = zip(mpx[0],mpx[1])[np.random.choice(range(len(mpx[0])), p=mp[mpx])]
 		marryTwoAgents(world,int(chosenPartners[0]),int(chosenPartners[1]))
-		mp = getMarriageProbs(world)
+		
+		# update marriage probs with new couple
+		mp[chosenPartners] = 0
+		mp[(chosenPartners[1],chosenPartners[0])] = 0
+		# normalise probabilities
+		if np.sum(mp)==0:
+			break
+		mp /= np.sum(mp)
+
 		if world.pop[chosenPartners[0]].deafStatus:
 			shortage_deaf -= 1
 		else:
@@ -55,7 +65,9 @@ def marriages(world):
 			shortage_deaf -= 1
 		else:
 			shortage_hearing -= 1
-		minmp = np.min(mp)*0.01
+		#minmp = np.min(mp)*0.01
+		
+		# If we've reached quota for a class, make these marriages unlikely
 		if shortage_deaf<=0 and shortage_deaf >-2:
 			deafx = [a.deafStatus for a in world.pop]
 			deafx =  np.subtract.outer(deafx,deafx)
@@ -73,43 +85,43 @@ def marriages(world):
 				mp /= sumx
 			shortage_hearing = -2
 
-def getMarriageProbs(world):
-	
-	ms = copy.deepcopy(world.marriageStructure)
-	ps = copy.deepcopy(world.popStructure)
-	# exclude agents who have enough marriage partners
-	married = np.where(np.sum(ms,axis=1)>=world.parameters["maxNumberOfMarriagePartners"])
-	ps[married,:] = 0
-	ps[:,married] = 0
-	
-	# exclude agents in the same compound
-	cx = outer_equals(world.compounds)
-	ps[np.where(cx==1)] = 0
-	
-	# exclude agents of the same sex
-	g = [a.sex for a in world.pop]
-	gx = abs(np.subtract.outer(g,g))
-	ps[np.where(gx<0.5)] = 0
-	
-	# weight preferences by social structure
-	dpref = copy.deepcopy(world.popStructure)
-	dpref[:] = 0
-	deafx = [a.deafStatus for a in world.pop]
-	deafx =  np.subtract.outer(deafx,deafx)
-	
-	# weight social structure by marriage attitudes
-	dpref[np.where(deafx)] = world.parameters["marriageAttitudes_deaf_deaf"]
-	dpref[np.where(deafx==False)] = world.parameters["marriageAttitudes_deaf_hearing"]
-	
-	# manipulate dpref to exclude agents as above
-	mpref = dpref * ps
-	sump = np.sum(mpref)
-	if sump>0:
-		# normalise
-		mpref = mpref /sump
-	return mpref
+# def getMarriageProbs_old(world):
+# 	
+# 	ms = copy.deepcopy(world.marriageStructure)
+# 	ps = copy.deepcopy(world.popStructure)
+# 	# exclude agents who have enough marriage partners
+# 	married = np.where(np.sum(ms,axis=1)>=world.parameters["maxNumberOfMarriagePartners"])
+# 	ps[married,:] = 0
+# 	ps[:,married] = 0
+# 	
+# 	# exclude agents in the same compound
+# 	cx = outer_equals(world.compounds)
+# 	ps[np.where(cx==1)] = 0
+# 	
+# 	# exclude agents of the same sex
+# 	g = [a.sex for a in world.pop]
+# 	gx = abs(np.subtract.outer(g,g))
+# 	ps[np.where(gx<0.5)] = 0
+# 	
+# 	# weight preferences by social structure
+# 	dpref = copy.deepcopy(world.popStructure)
+# 	dpref[:] = 0
+# 	deafx = [a.deafStatus for a in world.pop]
+# 	deafx =  np.subtract.outer(deafx,deafx)
+# 	
+# 	# weight social structure by marriage attitudes
+# 	dpref[np.where(deafx)] = world.parameters["marriageAttitudes_deaf_deaf"]
+# 	dpref[np.where(deafx==False)] = world.parameters["marriageAttitudes_deaf_hearing"]
+# 	
+# 	# manipulate dpref to exclude agents as above
+# 	mpref = dpref * ps
+# 	sump = np.sum(mpref)
+# 	if sump>0:
+# 		# normalise
+# 		mpref = mpref /sump
+# 	return mpref
 
-def getMarriageProbs2(world):
+def getMarriageProbs(world):
 	"""Set marriage preferences based on seperate marriage weights,
 	  and by communicative success"""
 
@@ -121,19 +133,18 @@ def getMarriageProbs2(world):
 	ps[:,married] = 0
 	
 	
-	# TODO
-	#  combine clans and compounds weights somehow
-	
 	# exclude agents in the same compound
-	cx = outer_equals(world.compounds)
+	cx = outer_equals(np.array(world.compounds))
 	# set to zero to exclude agents in same compound
-	ps[np.where(cx==1)] = world.parameters["compoundWeightMarry"]
+	ps[np.where(cx==1)] *= world.parameters["compoundWeightMarry"]
 	
-	clanx = outer_equals(world.clanss)
-	ps[np.where(cx==1)] = wordl.parameters["clanWeightMarry"]
+	# weight by clans
+	# (e.g. data suggests 50% chance marrying inside clan)
+	clanx = outer_equals(np.array(world.clans))
+	ps[np.where(clanx==1)] *= world.parameters["clanWeightMarry"]
 	
 	# exclude agents of the same sex
-	g = [a.sex for a in world.pop]
+	g = np.array([a.sex for a in world.pop])
 	gx = abs(np.subtract.outer(g,g))
 	ps[np.where(gx<0.5)] = 0
 	
@@ -142,45 +153,51 @@ def getMarriageProbs2(world):
 	
 	# weight preferences by communicative ability
 	cs = getCommunicativeSimilarity(world) #* world.parameters["comSimilarityMarry"]
+	cs *= world.parameters["comSimilarityMarry"]
 	mpref = ps * cs
-	
-	return mpref
+	# Normalise
+ 	sump = np.sum(mpref)
+ 	if sump>0:
+ 		# normalise
+ 		mpref = mpref /sump
+ 	return mpref
 
-def getMarriageProbs(world):
-	
-	ms = copy.deepcopy(world.marriageStructure)
-	ps = copy.deepcopy(world.popStructure)
-	# exclude agents who have enough marriage partners
-	married = np.where(np.sum(ms,axis=1)>=world.parameters["maxNumberOfMarriagePartners"])
-	ps[married,:] = 0
-	ps[:,married] = 0
-	
-	# exclude agents in the same compound
-	cx = outer_equals(world.compounds)
-	ps[np.where(cx==1)] = 0
-	
-	# exclude agents of the same sex
-	g = [a.sex for a in world.pop]
-	gx = abs(np.subtract.outer(g,g))
-	ps[np.where(gx<0.5)] = 0
-	
-	# weight preferences by social structure
-	dpref = copy.deepcopy(world.popStructure)
-	dpref[:] = 0
-	deafx = [a.deafStatus for a in world.pop]
-	deafx =  np.subtract.outer(deafx,deafx)
-	
-	# weight social structure by marriage attitudes
-	dpref[np.where(deafx)] = world.parameters["marriageAttitudes_deaf_deaf"]
-	dpref[np.where(deafx==False)] = world.parameters["marriageAttitudes_deaf_hearing"]
-	
-	# manipulate dpref to exclude agents as above
-	mpref = dpref * ps
-	sump = np.sum(mpref)
-	if sump>0:
-		# normalise
-		mpref = mpref /sump
-	return mpref
+
+# def getMarriageProbs(world):
+# 	
+# 	ms = copy.deepcopy(world.marriageStructure)
+# 	ps = copy.deepcopy(world.popStructure)
+# 	# exclude agents who have enough marriage partners
+# 	married = np.where(np.sum(ms,axis=1)>=world.parameters["maxNumberOfMarriagePartners"])
+# 	ps[married,:] = 0
+# 	ps[:,married] = 0
+# 	
+# 	# exclude agents in the same compound
+# 	cx = outer_equals(world.compounds)
+# 	ps[np.where(cx==1)] = 0
+# 	
+# 	# exclude agents of the same sex
+# 	g = [a.sex for a in world.pop]
+# 	gx = abs(np.subtract.outer(g,g))
+# 	ps[np.where(gx<0.5)] = 0
+# 	
+# 	# weight preferences by social structure
+# 	dpref = copy.deepcopy(world.popStructure)
+# 	dpref[:] = 0
+# 	deafx = [a.deafStatus for a in world.pop]
+# 	deafx =  np.subtract.outer(deafx,deafx)
+# 	
+# 	# weight social structure by marriage attitudes
+# 	dpref[np.where(deafx)] = world.parameters["marriageAttitudes_deaf_deaf"]
+# 	dpref[np.where(deafx==False)] = world.parameters["marriageAttitudes_deaf_hearing"]
+# 	
+# 	# manipulate dpref to exclude agents as above
+# 	mpref = dpref * ps
+# 	sump = np.sum(mpref)
+# 	if sump>0:
+# 		# normalise
+# 		mpref = mpref /sump
+# 	return mpref
 
 def getCommunicativeSimilarity(world):
 	#signProp = [a.getMeaningCounts() for a in world.pop]
@@ -188,14 +205,17 @@ def getCommunicativeSimilarity(world):
 	
 	# compare how well each agent can communicate
 	mCounts = [a.getMeaningCounts() for a in world.pop]
-	dist = np.zeros((len(mCounts),len(mCounts))
-	for i,a in range(len(mCounts)-1):							
-		for j in range((len(mCounts)-1)-i):					
-			dist[i,j] = abs(mCounts[i]-mCounts[j])
+	lx = len(mCounts)
+	dist = np.zeros((lx,lx))
+	# iterate through lower triangle
+	for i in range(lx-1):
+		for j in range((lx-1)-i):
+			dist[i,j] = sum(np.abs(mCounts[i] - mCounts[j]))
 	# copy accross diagonal
-	dist[numpy.triu_indices(np.size(dist))] = dist[numpy.tril_indices(np.size(dist))]
 	
-	return dist
+	dist[np.triu_indices(lx)] = dist[np.tril_indices(lx)]
+	
+	return dist + 0.001
 
 def marryTwoAgents(world,a_index1,a_index2):
 	world.marriageStructure[a_index1,a_index2] = 1
