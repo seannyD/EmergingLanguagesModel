@@ -1,3 +1,5 @@
 *.pyc
 results/old/*
 results/old
+results/*
+*.DS_Store
