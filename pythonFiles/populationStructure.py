@@ -91,7 +91,9 @@ class world:
        # fill compounds
         self.compounds = [0]
         currentComp = 0
-
+		
+		
+		#TODO: does this mean that some compounds have people from multiple clans?
         for i in range(len(self.clans))[1:]:
         	self.compounds.append(currentComp)
         	if self.compounds.count(currentComp)>= self.parameters["MaxSizeCompounds"]:

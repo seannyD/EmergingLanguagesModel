@@ -3,65 +3,170 @@ library(ggplot2)
 library(lattice)
 setwd("~/Documents/MPI/EmergingLanguages/SignSpeechConnieBill/Model/")
 
+# 500 stages = 70 years
+timescale = 70/500
 
+makePDF = function(pdfName,widthx){
+  pdf(paste("analysis/graphs/",pdfName,sep=''),width=widthx,height=4)
+}
 
-plotMeanRun = function(dx, plotIndividualRuns=F){
-	px = ggplot(data=dx, aes(x=stage, y=prop.deaf, group=runName)) +
-	 geom_smooth(aes(colour=runName), lwd=2)  +
-	 xlab("") +
-	 ylab("Proportion of\ndeaf agents") +
+fixLabels = function(dx,labs){
+  current_labs = unique(dx$runName)
+  for(i in 1:length(current_labs)){
+    dx[dx$runName==current_labs[i],]$runName = labs[i]
+  }
+  dx$runName = factor(dx$runName,levels = labs)
+  #dx$runName = relevel(dx$runName,labs[i])
+  return(dx)
+}
+
+plotMeanRun = function(dx, labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4){
+  
+  if(!is.na(pdfName)){
+    makePDF(pdfName,widthx)
+  }
+  dx = fixLabels(dx,labels)
+  
+  if(plotYears){
+	  px = ggplot(data=dx, aes(x=year, y=prop.deaf, group=runName)) 
+  } else{
+    px = ggplot(data=dx, aes(x=stage, y=prop.deaf, group=runName))  
+  }
+	  
+	px = px + geom_smooth(aes(colour=runName), lwd=2)  +
+	 xlab("Years") +
+	 ylab("D") +
 	 theme(legend.position="top", axis.title.y=element_text(angle=0),legend.title=element_blank())  
 
 	 if(plotIndividualRuns){
 	 	px = px + 	geom_line(aes(group=runNameNum, colour=runName), alpha=0.2)
 	 }
-
+	print(px)
+	if(!is.na(pdfName)){
+	  dev.off()
+	}
 	return(px)
 }
 
-plotMeanHearingSigns = function(dx, plotIndividualRuns=F){
-	px = ggplot(data=dx, aes(x=stage, y=prop.signs,group=runName))+
-	geom_smooth(aes(colour=runName), lwd=2) +
-	xlab("Stages") +
-	ylab("Proportion\nof signs\nper hearing\nagent")+
+plotMeanHearingSigns = function(dx,labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4){
+  
+  if(!is.na(pdfName)){
+    makePDF(pdfName,widthx)
+  }
+  
+  dx = fixLabels(dx,labels)
+  
+  if(plotYears){
+   	px = ggplot(data=dx, aes(x=year, y=prop.signs,group=runName))
+  } else{
+    px = ggplot(data=dx, aes(x=stage, y=prop.signs,group=runName))
+  }
+	px = px +geom_smooth(aes(colour=runName), lwd=2) +
+	xlab("Years") +
+	ylab("S")+
 	 theme(legend.position="top", axis.title.y=element_text(angle=0), legend.title=element_blank())
 	 
 	 if(plotIndividualRuns){
 	 	px = px + geom_line(aes(group=runNameNum, colour=runName), alpha=0.2)
 	 }
+	print(px)
+	if(!is.na(pdfName)){
+	  dev.off()
+	}
+	
 	 return(px)
 	}
 
 
 
 loadData = function(paramName){
+	 res = loadDataHist(paramName)
+ 	param = params[params$RunName==paramName,]
+ 	popSize = param$nAgents
+# 	#popSize = 76
+# 	
+# 	folder = paste("results/", paramName,'/',sep='')
+# 	res = data.frame()
+# 	files = list.files(folder,"*.res")
+# 	
+# 	for(i in 1:length(files)){
+# 		d = read.csv(paste(folder,files[i],sep=''),header=T,quote='')
+# 		names(d) = c("stage","id","deaf","signs","sounds",'structure','age')
+# 		d$prop.signs = d$signs/(d$signs+d$sounds)
+# 	d$prop.signs[is.nan(d$prop.signs)] = 0
+# 		d$runNum = i
+# 		res = rbind(res,d)
+# 	}
 	
-	param = params[params$RunName==paramName,]
-	popSize = param$nAgents
-	#popSize = 76
-	
-	folder = paste("results/", paramName,'/',sep='')
-	res = data.frame()
-	files = list.files(folder,"*.res")
-	
-	for(i in 1:length(files)){
-		d = read.csv(paste(folder,files[i],sep=''),header=T,quote='')
-		names(d) = c("stage","id","deaf","signs","sounds")
-		d$prop.signs = d$signs/(d$signs+d$sounds)
-	d$prop.signs[is.nan(d$prop.signs)] = 0
-		d$runNum = i
-		res = rbind(res,d)
-	}
-	
-	ressum = ddply(res, .(runNum,stage), summarize, prop.signs = mean(prop.signs), nDeaf = sum(deaf))
+	ressum = ddply(res, .(runNum,stage), summarize, prop.signs = mean(prop.signs,na.rm=T), nDeaf = sum(deaf))
 	ressum$runName = paramName
 	ressum$runNameNum = paste(ressum$runName,ressum$runNum)
 	
 	ressum$prop.deaf = ressum$nDeaf / popSize
 	
+	ressum$year = ressum$stage * timescale
+	
 	return(ressum)
 }
 
+loadDataHist = function(paramName){
+    
+    param = params[params$RunName==paramName,]
+    popSize = param$nAgents
+    #popSize = 76
+    
+    folder = paste("results/", paramName,'/',sep='')
+    res = data.frame()
+    files = list.files(folder,"*.res")
+    
+    for(i in 1:length(files)){
+      d = read.csv(paste(folder,files[i],sep=''),header=T,quote='')
+      names(d) = c("stage","id","deaf","signs","sounds",'structure','age')
+      d$prop.signs = d$signs/(d$signs+d$sounds)
+      d$prop.signs[is.nan(d$prop.signs)] = 0
+      d$runNum = i
+      res = rbind(res,d)
+    }
+    res$prop.signs = res$signs/(res$signs+res$sounds)
+
+    return(res)
+}
+
+plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100){
+  
+  colx = c("#FF7F00", "#00B0FF")
+  
+  dx = dxx[dxx$stage==stagex,]
+  nonfluent = 681/(2189-372)
+  fluent = 449 / (2189-372)
+  balanced = 78 / (2189-372)
+  non = 562 / (2189-372)
+  
+  nonfluent.chican = 211/(720-156)
+  fluent.chican = 100 / (720-156)
+  balanced.chican = 21 / (720-156)
+  non.chican = 215 / (2189-372)
+  
+  
+  
+  # balanced
+  balanced.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[1],na.rm=T)/nrow(dx)
+  # fluent
+  fluent.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[2] & (dx[dx$deaf==0,]$prop.signs <= cuts[1]),na.rm=T) / nrow(dx)
+  # non-fluent
+  nonfluent.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[3] & (dx[dx$deaf==0,]$prop.signs <= cuts[2]),na.rm=T)/nrow(dx)
+  # non-signers
+  non.m = sum(dx[dx$deaf==0,]$prop.signs <= cuts[3],na.rm=T)/nrow(dx)
+  
+  
+  barplot(rbind(
+    c(non,nonfluent,fluent,balanced)
+   # ,c(non.chican, nonfluent.chican,fluent.chican,balanced.chican)
+    ,c(non.m,nonfluent.m,fluent.m,balanced.m)
+    ),beside=T, ylab='Proportion of population',  names.arg = c("Non\nSigner","Non\nFluent",'Fluent','Balanced'), col =colx,border=NA, space=c(0,0.5))
+  legend(6,0.6,legend=c("Kata Kolok","Model"),col=colx,pch=15,cex=1)
+  
+}
 
 ##########
 
@@ -80,89 +185,66 @@ params[nrow(params),c("RunName","nAgents")] = c("KK_800Community",800)
 
 params$nAgents = as.numeric(params$nAgents)
 
-pdf("analysis/graphs/SummaryGraphs.pdf")
+kkDefault = loadData("KK_Default")
 
 test3 = rbind(
-	loadData("KK_Default"),
 	loadData("KK_SmallCommunity"),
+	kkDefault,
 	loadData("KK_LargeCommunity")
 )
 
-test3[test3$runName=="KK_Default",]$runName = "Medium"
-test3[test3$runName=="KK_SmallCommunity",]$runName = "Small"
-test3[test3$runName=="KK_LargeCommunity",]$runName = "Large"
 
-
-plotMeanRun(test3,plotIndividualRuns=F)
-plotMeanHearingSigns(test3,plotIndividualRuns=F)
-
-
-
-test3 = rbind(
-	loadData("KK_Default"),
-	loadData("KK_SmallCommunity"),
-	loadData("KK_LargeCommunity"),
-	loadData("KK_100Community"),
-	loadData("KK_800Community")
-)
-
-test3[test3$runName=="KK_Default",]$runName = "1000"
-test3[test3$runName=="KK_SmallCommunity",]$runName = "500"
-test3[test3$runName=="KK_LargeCommunity",]$runName = "2000"
-test3[test3$runName=="KK_100Community",]$runName = "100"
-test3[test3$runName=="KK_800Community",]$runName = "800"
-
-
-plotMeanRun(test3,plotIndividualRuns=F)
-plotMeanHearingSigns(test3,plotIndividualRuns=F)
-
-
-#####
 
 test4 = rbind(
-	loadData("KK_Default"),
-	loadData("KK_NoSocialStructure")
+  loadData("BulelengGeneralSituation"),
+  kkDefault,
+	loadData("KK_NoSocialStructure"),
+  loadData("UrbanSituation")
 )
-plotMeanRun(test4)
-plotMeanHearingSigns(test4)
 
-test4 = rbind(
-	loadData("KK_Default"),
-	loadData("KK_NoSocialStructure")
-)
-plotMeanRun(test4)
-plotMeanHearingSigns(test4)
 
 test5 = rbind(
 	loadData("KK_LowIncidence"),
-	loadData("KK_Default"),
-	loadData("KK_HighIncidence")
+	kkDefault
+	,loadData("KK_HighIncidence")
 )
-plotMeanRun(test5)
-plotMeanHearingSigns(test5)
+
 
 test6 = rbind(
-	loadData("KK_HearingCarriersLow"),
-	loadData("KK_Default"),
-	loadData("KK_HearingCarriersHigh")
-)
-plotMeanRun(test6)
-plotMeanHearingSigns(test6)
+ 	loadData("KK_HearingCarriersLow"),
+ 	kkDefault,
+ 	loadData("KK_HearingCarriersHigh")
+ )
+# plotMeanRun(test6)
+# plotMeanHearingSigns(test6)
 
 test7 = rbind(
-	loadData("KK_DeafMarriageTabooModerate"),
-	loadData("KK_Default"),
-	loadData("KK_DeafMarriageTabooMax")
-)
-plotMeanRun(test7)
-plotMeanHearingSigns(test7)
-
-test8 = rbind(
-	loadData("BulelengGeneralSituation"),
-	loadData("KK_Default"),
-	loadData("UrbanSituation")
+	loadData("KK_CommHigh"),
+	kkDefault,
+	loadData("KK_CommLow")
 )
 
-plotMeanRun(test8)
-plotMeanHearingSigns(test8)
+
+
+plotMeanRun(test3, c("Small","KK","Large"), plotIndividualRuns=F,pdfName='MR_Size.pdf')
+plotMeanHearingSigns(test3, c("Small","KK","Large"),plotIndividualRuns=F,'HS_Size.pdf')
+
+
+plotMeanRun(test4, c("Region","KK","No Social Structure","Urban"), pdfName = 'MR_Social.pdf')
+plotMeanHearingSigns(test4, c("Region","KK","No Social Structure","Urban"), pdfName = 'HS_Social.pdf')
+
+plotMeanRun(test5, c("Low","KK","High"), pdfName = 'MR_DIncidence.pdf',widthx=3)
+plotMeanHearingSigns(test5, c("Low","KK","High"), pdfName = 'HS_DIncidence.pdf',widthx=3)
+
+plotMeanRun(test6, c("Low","KK","High"), pdfName = 'MR_DCarriers.pdf',widthx=3)
+plotMeanHearingSigns(test6, c("Low","KK","High"), pdfName = 'HS_DCarriers.pdf',widthx=3)
+
+plotMeanRun(test7, c("High","KK","Low"), pdfName = 'MR_Comm.pdf')
+plotMeanHearingSigns(test7, c("High","KK","Low"), pdfName = 'HS_Comm.pdf')
+
+
+
+kdh = loadDataHist("KK_Default")
+pdf("analysis/graphs/Fluency.pdf", width=4.5,height=5)
+plotFluency(kdh,stagex=600,cuts = c(0.45,0.25,0.1))
 dev.off()

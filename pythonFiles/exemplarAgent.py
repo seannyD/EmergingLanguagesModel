@@ -52,6 +52,10 @@ class agentEpsilon:
         self.age += 1
 		
     def getMeaningCountsM(self,modality):
+    	
+    	# TODO: this currently gets the proporiton of signed to spoken signals for each signal type
+    	# however, it was intended to do it by meaning, not by signal type.
+    
 		if not modality in self.memory.keys():
 			if modality=="0":
 				return np.array([0] * self.nm)
