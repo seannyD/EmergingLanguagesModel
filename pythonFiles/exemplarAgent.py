@@ -88,7 +88,7 @@ class agentEpsilon:
     def listen(self,datapair):
         if datapair == None:
             return None
-        if self.deafStatus == True and datapair[0] ==1:
+        if self.deafStatus and datapair[0] ==1:
             return None
         else:
             if str(datapair[0]) in self.memory.keys():

@@ -5,6 +5,7 @@ from parameters import *
 from genetics import *
 from marriage import *
 import copy
+import random
 
 class InteractionsMaker:
   "Docstring"
@@ -40,9 +41,12 @@ class InteractionsMaker:
           nSounds = "0"
         popString = ""
         ageString = str(thisAgent.age)
+        
+        fluencyString = str(self.interviewDeaf(self.world.pop[i]))
+        
       #  for i in np.nditer(self.world.popStructure):
       #    popString += str(i)+"-"
-        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString])+"\n"
+        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString, fluencyString])+"\n"
 #      if write:
 #        f = open(self.filename,'a')
 #        f.write(outString)
@@ -92,6 +96,13 @@ class InteractionsMaker:
       else:
               return ""
 
-
+  def interviewDeaf(self,a):
+      deafAgents = [x for x in self.world.pop if x.deafStatus]
+      if len(deafAgents) > 0:
+        interviewer = random.choice(deafAgents)
+        mCountsA = a.getMeaningCountsM("0")
+        mCountsI = interviewer.getMeaningCountsM("0")
+        return sum(np.abs(mCountsA - mCountsI))
+      return 0.0
 
 
