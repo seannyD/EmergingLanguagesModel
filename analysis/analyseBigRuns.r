@@ -20,7 +20,7 @@ fixLabels = function(dx,labs){
   return(dx)
 }
 
-plotMeanRun = function(dx, labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4){
+plotMeanRun = function(dx, labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4,ylimx=c(0,10.5)){
   
   if(!is.na(pdfName)){
     makePDF(pdfName,widthx)
@@ -35,8 +35,9 @@ plotMeanRun = function(dx, labels, plotIndividualRuns=F,pdfName=NA,plotYears = T
 	  
 	px = px + geom_smooth(aes(colour=runName), lwd=2)  +
 	 xlab("Years") +
-	 ylab("D") +
-	 theme(legend.position="top", axis.title.y=element_text(angle=0),legend.title=element_blank())  
+	 ylab("% Deaf Individuals") +
+#	  coord_cartesian(ylim=ylimx) +
+	 theme(legend.position="top", axis.title.y=element_text(angle=90),legend.title=element_blank())  
 
 	 if(plotIndividualRuns){
 	 	px = px + 	geom_line(aes(group=runNameNum, colour=runName), alpha=0.2)
@@ -48,7 +49,7 @@ plotMeanRun = function(dx, labels, plotIndividualRuns=F,pdfName=NA,plotYears = T
 	return(px)
 }
 
-plotMeanHearingSigns = function(dx,labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4){
+plotMeanHearingSigns = function(dx,labels, plotIndividualRuns=F,pdfName=NA,plotYears = T,widthx=4,ylimx=c(0,40)){
   
   if(!is.na(pdfName)){
     makePDF(pdfName,widthx)
@@ -63,8 +64,9 @@ plotMeanHearingSigns = function(dx,labels, plotIndividualRuns=F,pdfName=NA,plotY
   }
 	px = px +geom_smooth(aes(colour=runName), lwd=2) +
 	xlab("Years") +
-	ylab("S")+
-	 theme(legend.position="top", axis.title.y=element_text(angle=0), legend.title=element_blank())
+	ylab("% Sign Vocabulary of Hearing Individuals")+
+#	  coord_cartesian(ylim=ylimx) +
+	 theme(legend.position="top", axis.title.y=element_text(angle=90), legend.title=element_blank())
 	 
 	 if(plotIndividualRuns){
 	 	px = px + geom_line(aes(group=runNameNum, colour=runName), alpha=0.2)
@@ -104,6 +106,9 @@ loadData = function(paramName){
 	
 	ressum$prop.deaf = ressum$nDeaf / popSize
 	
+	ressum$prop.deaf = ressum$prop.deaf *100
+	res$prop.signs = 100* res$prop.signs
+	
 	ressum$year = ressum$stage * timescale
 	
 	return(ressum)
@@ -128,11 +133,11 @@ loadDataHist = function(paramName){
       res = rbind(res,d)
     }
     res$prop.signs = res$signs/(res$signs+res$sounds)
-
+    
     return(res)
 }
 
-plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100){
+plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100, measure = "prop.signs"){
   
   colx = c("#FF7F00", "#00B0FF")
   
@@ -150,13 +155,13 @@ plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100){
   
   
   # balanced
-  balanced.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[1],na.rm=T)/nrow(dx)
+  balanced.m = sum(dx[dx$deaf==0,measure] > cuts[1],na.rm=T)/nrow(dx)
   # fluent
-  fluent.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[2] & (dx[dx$deaf==0,]$prop.signs <= cuts[1]),na.rm=T) / nrow(dx)
+  fluent.m = sum(dx[dx$deaf==0,measure] > cuts[2] & (dx[dx$deaf==0,measure] <= cuts[1]),na.rm=T) / nrow(dx)
   # non-fluent
-  nonfluent.m = sum(dx[dx$deaf==0,]$prop.signs > cuts[3] & (dx[dx$deaf==0,]$prop.signs <= cuts[2]),na.rm=T)/nrow(dx)
+  nonfluent.m = sum(dx[dx$deaf==0,measure] > cuts[3] & (dx[dx$deaf==0,measure] <= cuts[2]),na.rm=T)/nrow(dx)
   # non-signers
-  non.m = sum(dx[dx$deaf==0,]$prop.signs <= cuts[3],na.rm=T)/nrow(dx)
+  non.m = sum(dx[dx$deaf==0,measure] <= cuts[3],na.rm=T)/nrow(dx)
   
   
   barplot(rbind(
@@ -219,7 +224,8 @@ test6 = rbind(
 # plotMeanHearingSigns(test6)
 
 test7 = rbind(
-	loadData("KK_CommHigh"),
+  loadData("KK_CommVeryHigh"),
+	#loadData("KK_CommHigh"),
 	kkDefault,
 	loadData("KK_CommLow")
 )
@@ -239,8 +245,8 @@ plotMeanHearingSigns(test5, c("Low","KK","High"), pdfName = 'HS_DIncidence.pdf',
 plotMeanRun(test6, c("Low","KK","High"), pdfName = 'MR_DCarriers.pdf',widthx=3)
 plotMeanHearingSigns(test6, c("Low","KK","High"), pdfName = 'HS_DCarriers.pdf',widthx=3)
 
-plotMeanRun(test7, c("High","KK","Low"), pdfName = 'MR_Comm.pdf')
-plotMeanHearingSigns(test7, c("High","KK","Low"), pdfName = 'HS_Comm.pdf')
+plotMeanRun(test7, c("Important","KK","Not important"), pdfName = 'MR_Comm.pdf',ylimx=c(0.013,0.025))
+plotMeanHearingSigns(test7, c("Important","KK","Not important"), pdfName = 'HS_Comm.pdf')
 
 
 
@@ -248,3 +254,21 @@ kdh = loadDataHist("KK_Default")
 pdf("analysis/graphs/Fluency.pdf", width=4.5,height=5)
 plotFluency(kdh,stagex=600,cuts = c(0.45,0.25,0.1))
 dev.off()
+
+
+
+####
+d = read.csv("results/KK_Default/KK_Default236.res")
+
+d = d[d$stage>500,]
+
+deaf.m = median(d[d$deaf==1,]$fluency,na.rm=T)
+deaf.sd = sd(d[d$deaf==1,]$ fluency,na.rm=T)
+
+d$fluency2 = (d$fluency - deaf.m)/deaf.sd
+d$fluency2 = -d$fluency2 
+hist(d[d$deaf==0,]$fluency2)
+
+hist(d[d$deaf==0 & d$stage==600,]$fluency2, breaks=c(2,1,0,1,2))
+
+plotFluency(d[d$deaf==0,],stagex=600,cuts =c(1,0,-1), measure='fluency2')
