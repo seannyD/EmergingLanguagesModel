@@ -44,14 +44,16 @@ def assignGenetics(world):
 	# server mod
 	#nZeroOne = binom.rvs(n_oneCopy,.5)
 	nOneZero = n_oneCopy - nZeroOne
-	gene_distribution = ([(0,1)]*nZeroOne) + ([(1,0)]*nOneZero) + ([(1,1)] * n_twoCopies) + ([(0,0)] * n_zeroCopies)
+	gene_distribution = ([(1,1)] * n_twoCopies) +([(0,1)]*nZeroOne) + ([(1,0)]*nOneZero) + ([(0,0)] * n_zeroCopies)
 	
-	random.shuffle(gene_distribution)
-	
+	if world.parameters["initialDeafLocations"]=="Random":
+		random.shuffle(gene_distribution)
+		# otherwise: if not shuffled, then genes will be clustered by compound
+
 	for i in range(len(gene_distribution)):
 		agent = world.pop[i]
 		agent.genes = gene_distribution[i]
-		if gene_distribution[i] == (1,1):
+		if gene_distribution[i] == (1,1) or random.random() < world.parameters["NonGeneticDeafness"]:
 			agent.deafStatus = True
 		else:
 			agent.deafStatus = False
