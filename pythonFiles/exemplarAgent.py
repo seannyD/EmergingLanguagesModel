@@ -35,7 +35,7 @@ class agentEpsilon:
         self.ID = ID
         self.age = 0
   #      self.children = 0
-	
+
     def getSignProp(self):
 		""" Return the proportion of signs in the memory"""
 		if len(self.memory.keys())==0:
@@ -50,34 +50,34 @@ class agentEpsilon:
 
     def incAge(self):
         self.age += 1
-		
+
     def getMeaningCountsM(self,modality):
-    	
+
     	# TODO: this currently gets the proporiton of signed to spoken signals for each signal type
     	# however, it was intended to do it by meaning, not by signal type.
-    
+
 		if not modality in self.memory.keys():
 			if modality=="0":
 				return np.array([0] * self.nm)
 			else:
 				return np.array([0] * self.ns)
-		
+
 		if modality=="0":
 			return np.array([self.memory[modality].count(x) for x in range(self.nm)],dtype='float')
 		if modality=="1":
 			return np.array([self.memory[modality].count(x) for x in range(self.ns)],dtype='float')
-		
-	
+
+
     def getMeaningCounts(self):
     	dM = self.getMeaningCountsM("0")
     	hM = self.getMeaningCountsM("1")
     	ret = dM + hM
-    	
+
     	ret_max = np.max(ret)
     	if ret_max==0:
     		return ret
     	return ret / np.max(ret)
-	
+
     def updateCache(self,datapair):
         "datapair = [modality, signal]"
         "modality = 0 (sign) or 1 (speech)"
@@ -99,7 +99,7 @@ class agentEpsilon:
 
     def attitude(self):
         "If I am not a signer, but I encounter a deaf person, what do I do?"
-        
+
         return [0,np.random.randint(self.nm)]
         # server mod
         #return [0,random.randint(0,self.nm-1)]
@@ -130,19 +130,19 @@ class agentEpsilon:
                     chosenModality = stats.binom.rvs(n=1,p=self.alpha)
                     # server mod
                     #chosenModality = stats.binom.rvs(1,self.alpha)
-                    
+
                     datapair = np.array([chosenModality,np.random.randint(self.nm)])
                     # server mod
                     #datapair = np.array([chosenModality,random.randint(0,self.nm-1)])
                     self.memory[str(chosenModality)] = [datapair[1]]
                     return datapair
             else:
-            	
+
                 whichDatapair = random.choice(range(len(self.cache)))
                 # server mod
                 #whichDatapair = np.random.choice(range(len(self.cache)))
                 return self.cache[whichDatapair]
-                
+
 
 
 "Example Interaction"
@@ -153,67 +153,4 @@ def epsilonGame(speaker, hearer):
     return speaker, hearer
 
 signAgent, speechAgent = epsilonGame(signAgent,speechAgent)
-
-
-
-
-def makeFirstPop(geneticParams):
-    "Make an Initial population of agents according to the geneticParams"
-    """e.g.
-
-    popSize = geneticParams["popSize"]
-    nDeaf = geneticParams["nDeaf"]
-    speeachBias = geneticParams["alpha"]
-
-    hearingPopulation = [agentEpsilon(speechBias) for i in range(popSize-nDeaf)]
-    deafPopulation = [agentEpsilon(speechBias, deaf=True) for i in range(nDeaf)]
-    return hearingPopulation+deafPopulation
-
-    """
-    return 0
-
-def birthsDeaths(population,geneticParams,socialParams):
-    "remove some, add some, based on geneticParams and socialParams"
-    """
-    removalRate = geneticParams["removalRate"]
-    popSize = geneticParams[popSize]
-    nRemovals = stats.binom.rvs(n=popSize, p = removalRate)
-    """
-    return 0
-
-def chooseInterlocutors(population, socialParams):
-    "Choose who interacts"
-    return 0
-
-def interact(speaker, listener):
-    "Play a Language game"
-    utterance = speaker.speak()
-    updatedListener = listener.listen(whoTo=speaker)
-    return speaker, updatedListener
-
-def speakToEachOther(population, socialParams):
-    "How does the interaction update agents' knowledge?"
-    speaker, listener = chooseInterlocutors(population, socialParams)
-    updatedSpeaker, updatedListener = interact(speaker, listener)
-    return 0
-
-def assess(population):
-    "What quanitites are we interested in?"
-    return 0
-
-def simulationOutline(nInteractions, geneticParams,socialParams):
-    metrics = []
-    initialPopulation = makeFirstPop(geneticParams)
-    for i in range(nInteractions):
-        updatedGeneticPopulation = birthsDeaths(initialPopulation, geneticParams)
-        updatedCulturalPopulation = speakToEachOther(updatedGeneticPopulation,socialParams)
-        metrics.append(asses(updatedCulturalPopulation))
-    finalPopulation = updatedCulturalPopulation
-    return finalPopulation, metrics
-
-
-
-
-
-
 
