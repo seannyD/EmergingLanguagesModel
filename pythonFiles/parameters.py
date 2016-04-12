@@ -67,7 +67,7 @@ basic_parameters["nAgents"] = 10
 basic_parameters["alpha"]=0.9
 basic_parameters["nManualSigns"]=10
 basic_parameters["nSpokenSigns"]= 10
-
+basic_parameters["initialDeafLocations"] = "Random"  # or "Clan" or "Compound"
 
 
 kolok_parameters = basic_parameters
