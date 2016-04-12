@@ -82,7 +82,9 @@ def reproduce(agentA,agentB, world):
 	
 	baby_genetics = recombination(father,mother)
 	
-	baby = agentEpsilon(father.alpha, nManualSigns = father.nm, nSpokenSigns = father.ns, deaf=baby_genetics == (1,1), sex=random.choice([0,1]), genes=baby_genetics)
+	deafness = baby_genetics==(1,1) or random.random() < world.parameters["NonGeneticDeafness"]
+
+	baby = agentEpsilon(father.alpha, nManualSigns = father.nm, nSpokenSigns = father.ns, deaf=deafness, sex=random.choice([0,1]), genes=baby_genetics)
 
 	# patrilineal culture
 	world.addAgent( baby, father, [mother])
