@@ -43,10 +43,13 @@ class InteractionsMaker:
         ageString = str(thisAgent.age)
         
         fluencyString = str(self.interviewDeaf(self.world.pop[i]))
+
+        genotype = "".join([str(x) for x in thisAgent.genes])
+
         
       #  for i in np.nditer(self.world.popStructure):
       #    popString += str(i)+"-"
-        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString, fluencyString])+"\n"
+        outString += ",".join([stage,agentID,deafStatus,nSigns,nSounds,popString,ageString, fluencyString, genotype])+"\n"
 #      if write:
 #        f = open(self.filename,'a')
 #        f.write(outString)
