@@ -138,6 +138,7 @@ loadDataHist = function(paramName){
 }
 
 plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100, measure = "prop.signs"){
+  # Should pass whole population to this function
   
   colx = c("#FF7F00", "#00B0FF")
   
@@ -163,13 +164,13 @@ plotFluency = function(dxx,cuts = c(0.45,0.30,0.1) ,stagex = 100, measure = "pro
   # non-signers
   non.m = sum(dx[dx$deaf==0,measure] <= cuts[3],na.rm=T)/nrow(dx)
   
-  
+  par(xpd=T)
   barplot(rbind(
     c(non,nonfluent,fluent,balanced)
    # ,c(non.chican, nonfluent.chican,fluent.chican,balanced.chican)
     ,c(non.m,nonfluent.m,fluent.m,balanced.m)
     ),beside=T, ylab='Proportion of population',  names.arg = c("Non\nSigner","Non\nFluent",'Fluent','Balanced'), col =colx,border=NA, space=c(0,0.5))
-  legend(6,0.6,legend=c("Kata Kolok","Model"),col=colx,pch=15,cex=1)
+  legend(-0.8,0.4,legend=c("Kata Kolok","Model"),col=colx,pch=15,cex=1)
   
 }
 
@@ -269,6 +270,7 @@ d$fluency2 = (d$fluency - deaf.m)/deaf.sd
 d$fluency2 = -d$fluency2 
 hist(d[d$deaf==0,]$fluency2)
 
-hist(d[d$deaf==0 & d$stage==600,]$fluency2, breaks=c(2,1,0,1,2))
 
-plotFluency(d[d$deaf==0,],stagex=600,cuts =c(1,0,-1), measure='fluency2')
+pdf("analysis/graphs/Fluency_Interview.pdf", width=4.5,height=5)
+plotFluency(d,stagex=600,cuts =c(1,0,-1), measure='fluency2')
+dev.off()

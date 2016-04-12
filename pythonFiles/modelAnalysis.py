@@ -38,7 +38,7 @@ def writeResultsString(res,file):
 
 def simulation(parameters):
 
-	resultsString = "stage,id,deaf,signs,sounds,structure,age\n"
+	resultsString = "stage,id,deaf,signs,sounds,structure,age,fluency\n"
 	print "Setting up world"
 	world1 = world(parameters)
 	if world1.parameters["RunName"]=="Test":
