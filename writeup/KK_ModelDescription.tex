@@ -43,7 +43,7 @@ where $\mathcal{M} = \{m_i\colon i =1,\ldots,n\}$ is a record of the modality fo
 
 \subsection{Modalities in Action} % (fold)
 \label{sub:modalities_in_action}
-Individuals' use of signals during interactions is governed by a set of simple heuristics. These heuristics express patterns of conditional usage of sign or speech as a function of the interlocutor's deaf status. 
+Individuals' use of signals during interactions is governed by a set of simple heuristics. These heuristics express patterns of conditional usage of sign or speech as a function of the interlocutor's deaf status.
 
 In each `stage', every agent chooses another agent to interact with, in accordance with the social structure weights outlined below (they are more likely to interact with someone close to them in the social structure). The first agent is the speaker and the chosen partner is the listener.  Therefore, every agent transmits a signal, but may receive many or none.
 
@@ -75,7 +75,7 @@ Comm(agents_i, agents_j) = | b_i - b_j |
 
 \section{Social structure}
 
-A world contains a fixed number of agents, controlled by $Param_{nAgents}$.  Agents are assigned a random sex (stored in a vector $sex$ and a set of genes (see section below).  Each agent has a hearing status (either hearing or deaf, stored in a vector $deaf$).  
+A world contains a fixed number of agents, controlled by $Param_{nAgents}$.  Agents are assigned a random sex (stored in a vector $sex$ and a set of genes (see section below).  Each agent has a hearing status (either hearing or deaf, stored in a vector $deaf$).
 
 Agents belong to a compound, and a compound belongs to a clan.  Compounds and clans are stored as vectors $clan$ and $compound$ of length $Param_{nAgents}$.  The number of clans is fixed at $Param_{nClans}$.  The maximum number of people in a compound is fixed at $Param_{MaxSizeCompounds}$.
 
@@ -94,7 +94,7 @@ S_{i,j} = & same(clan_{i}, clan{j})Param_{clanWeight}   \\
 
 
 \section{Marriage}
-A matrix $M$ keeps track of which individuals are married.  A matrix $F$ stores the weights of likelihoods that each agent would marry every other agent.  
+A matrix $M$ keeps track of which individuals are married.  A matrix $F$ stores the weights of likelihoods that each agent would marry every other agent.
 
 There are some hard constraints on who can become married ($F_{i,j}$ is set to 0):  Agents are not permitted to have more than $Param_{maxNumberOfMarriagePartners}$ marriage partners.  Agents can only marry an agent with opposing sex.  Beyond those constraints, $F$ is set to reflect
 
@@ -118,7 +118,7 @@ Marriages occur periodically, with agent $i$ and $j$ being selected for marriage
 
 Every 3 stages, a number of births and deaths may occur with probability $Param_{probOfBirthDeathEachStage}$.  A number of agents are added to the population, up to $Param_{maxNumberOfBirthDeathEachStage}$.  A random married couple is selected and a child agent is added to the population.  The child inherits its genetics from its parents (see below).  It inherits its clan, compound and social structure weights from either its mother or its father, depending on $Param_{CulturalInheritance}$ (currently only patrilineal is implemented).
 
-After this, an equal number of agents are selected at random to be removed from the population (so the population size remains stable).  
+After this, an equal number of agents are selected at random to be removed from the population (so the population size remains stable).
 
 \subsection{Genetics}
 Agents carry two genetic alleles, a `deaf' allele and a `hearing' allele.  The deaf allels are recessive, so an agent must have two deaf alleles to possess a deaf phenotype.  Child agents receive one randomly selected allele from each of their 2 parents.

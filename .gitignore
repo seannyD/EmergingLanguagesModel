@@ -3,3 +3,6 @@ results/old/*
 results/old
 results/*
 *.DS_Store
+writeup/*
+!writeup/*.tex
+!writeup/*.pdf
