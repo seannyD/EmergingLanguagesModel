@@ -104,6 +104,83 @@ class agentEpsilon:
         # server mod
         #return [0,random.randint(0,self.nm-1)]
 
+    def choiceNd(m):
+        "Given an Nd array of probabilities, chooose an index in that array according to those probabilities."
+        # flatten matrix to 1d
+        mx = np.ndarray.flatten(m)
+        # choose an index according to these probabilities
+        ichoice = np.random.choice(range(len(mx)),p=mx)
+        # make an array of indices
+        indexArray = np.arange(len(mx)).reshape(m.shape)
+        # return the indices of the chosen item
+        return np.array([x[0] for x in np.where(indexArray==ichoice)])
+
+
+    def speak(self, whoTo):
+        chosenMeaning = np.random.randint(self.nc)
+        if whoTo.deafStatus or self.deafStatus:
+            # one is deaf
+            chosenModality = 0
+            mem = self.memory[chosenModality,chosenModality,:]
+            chosenSign = -1
+            if np.sum(mem) ==0:
+                chosenSign = np.random.randint(self.nm)
+                self.memory[chosenModality,chosenMeaning,chosenSign] += 1
+            else:
+                ps = mem / np.sum(mem)
+                chosenSign = np.random.choice(range(self.nm),p=ps)
+            return np.array([chosenModality,chosenMeaning,chosenSign])
+
+        else:
+            # both are hearing
+            mem = self.memory[:,chosenMeaning,:] # 2d array
+            if np.sum(mem) == 0:
+                chosenModality = stats.binom.rvs(n=1,p=self.alpha)
+                chosenSign = np.random.randint(self.nm)
+                self.memory[chosenModality,chosenMeaning,chosenSignalIndex] += 1
+                return np.array([chosenModality,chosenMeaning,chosenSign])
+            else:
+                mem[0,:,:] *= (1 - self.alpha)
+                mem[1,:,:] *= self.alpha
+                mem /= np.sum(mem)
+                res = choiceNd(mem)
+                return np.array([res[0],chosenMeaning,res[1]])
+
+
+
+
+
+
+"Example Interaction"
+signAgent, speechAgent = agentEpsilon(.55,deaf=True), agentEpsilon(.55)
+def epsilonGame(speaker, hearer):
+    utterance = speaker.speak(whoTo=hearer)
+    hearer.listen(utterance)
+    return speaker, hearer
+
+signAgent, speechAgent = epsilonGame(signAgent,speechAgent)
+
+
+
+
+
+def playGames(nHearing, nDeaf, nGames):
+    deafPop = [agentEpsilon(.95,deaf=True) for i in range(nDeaf)]
+    hearingPop = [agentEpsilon(.95,deaf=True) for i in range(nHearing)]
+    totalPop = deafPop+hearingPop
+    for k in range(nGames):
+        speaker, listener = np.random.choice(totalPop,size=2,replace=False)
+        utterance = speaker.speak(whoTo=listener)
+        listener.listen(utterance)
+    return totalPop
+
+
+
+
+
+'''
+OLD CODE GOES HERE
+
 
     def speak(self, whoTo):
         "whoTo = another agentEpsilon instance"
@@ -117,15 +194,15 @@ class agentEpsilon:
                 ps = signMemory/nSigns
                 chosenSign = np.where(np.random.multinomial(1,pvals = ps)==1)[0][0]
                 return [0,meaning,chosenSign]
-            	# server mod
+                # server mod
                 #return np.array([0,random.choice(self.memory["0"])])
             else: # If i don't know signs, what do i do?
                 return self.attitude(meaning=meaning)
         else:
             if np.sum(self.memory) == 0:
                 if self.deafStatus == True:
-                	#server mod
-                	#datapair = np.array([0,random.randint(0,self.nm-1)])
+                    #server mod
+                    #datapair = np.array([0,random.randint(0,self.nm-1)])
                     chosenSign = np.random.randint(self.nm)
                     datapair = np.array([0,meaning, chosenSign])
                     self.memory[0,meaning,chosenSign] += 1
@@ -158,15 +235,4 @@ class agentEpsilon:
                 chosenSignalIndex =  np.where(np.random.multinomial(1,contenderPs)==1)[0][0]
 
                 return [chosenModality,meaning,chosenSignalIndex]
-
-
-
-"Example Interaction"
-signAgent, speechAgent = agentEpsilon(.55,deaf=True), agentEpsilon(.55)
-def epsilonGame(speaker, hearer):
-    utterance = speaker.speak(whoTo=hearer)
-    hearer.listen(utterance)
-    return speaker, hearer
-
-signAgent, speechAgent = epsilonGame(signAgent,speechAgent)
-
+'''
